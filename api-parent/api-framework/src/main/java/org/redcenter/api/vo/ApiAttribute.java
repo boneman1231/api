@@ -9,6 +9,8 @@ public class ApiAttribute {
 	protected String type;
 
 	protected String value;
+	
+	protected String description;
 
 	public ApiAttribute() {
 	}
@@ -18,13 +20,16 @@ public class ApiAttribute {
 		this.name = key;
 		this.type = String.class.getName();
 		this.value = value;
+		this.description = "";
 	}
 
-	public ApiAttribute(String key, String name, String type, String value) {
+	public ApiAttribute(String key, String name, String type, String value,
+			String description) {
 		this.key = key;
 		this.name = name;
 		this.type = type;
 		this.value = value;
+		this.description = description;
 	}
 
 	public String getName() {
@@ -57,5 +62,13 @@ public class ApiAttribute {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

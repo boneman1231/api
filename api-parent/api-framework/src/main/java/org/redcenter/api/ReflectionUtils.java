@@ -30,9 +30,15 @@ public class ReflectionUtils {
 	}
 
 	public static <T> T valueOf(Class<T> clazz, String arg) {
-		Exception cause = null;
+		Throwable cause = null;
 		T value = null;
 		try {
+			// set default value 0 for null value with number type
+			if ((arg == null || arg.isEmpty())
+					&& Number.class.isAssignableFrom(clazz)) {
+				arg = "0";
+			}
+
 			value = clazz.cast(clazz.getDeclaredMethod("valueOf", String.class)
 					.invoke(null, arg));
 		} catch (NoSuchMethodException e) {
@@ -40,7 +46,7 @@ public class ReflectionUtils {
 		} catch (IllegalAccessException e) {
 			cause = e;
 		} catch (InvocationTargetException e) {
-			cause = e;
+			cause = e.getTargetException();
 		}
 		if (cause == null) {
 			return value;

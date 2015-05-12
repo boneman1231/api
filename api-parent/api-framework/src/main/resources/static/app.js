@@ -20,6 +20,12 @@ mainModule.controller("ApiController",
 	
 	$scope.updateMethod = function () {		
 		//$scope.resultArea = JSON.stringify($scope.methodSelect);
+		$scope.paramModel = {};
+		
+		// set initial value
+		angular.forEach($scope.methodSelect.inputs, function(value) {
+			$scope.paramModel[value.key]='';
+		});	
 	};	
 	
 	$scope.submit = function () {		
@@ -35,7 +41,7 @@ mainModule.controller("ApiController",
 			methodName: $scope.methodSelect.key, params:params };
 			
 		$http.post(contentUrl, dataObj).success(function(data) {	  		  
-			$scope.resultArea = data.name;
+			$scope.resultArea = data.value;
 		});		  
 	};	
   }

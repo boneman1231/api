@@ -11,4 +11,6 @@ public @interface Api {
 	Class<?> type() default String.class;
 
 	String[] options() default {};
+	
+	String desc() default "";
 }

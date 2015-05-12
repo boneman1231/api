@@ -8,67 +8,42 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.redcenter.api.target.TestApiClass;
 import org.redcenter.api.vo.ApiAttribute;
 import org.redcenter.api.vo.ApiInvokeRequest;
 import org.redcenter.api.vo.ApiNode;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
-//@RestController
+@SpringBootApplication
 public class ApiController {
 
 	public static void main(String[] args) {
-		ApiController controller = new ApiController();
+		// SpringApplication.run(Application.class, args);
+		ApplicationContext ctx = SpringApplication.run(ApiController.class,
+				args);
+		System.out.println("Let's inspect the beans provided by Spring Boot:");
 
-		System.out.println("getClasses:");
-		ArrayList<ApiAttribute> list = controller.getClasses();
-		for (ApiAttribute apiAttribute : list) {
-			System.out.println(apiAttribute.getName() + "="
-					+ apiAttribute.getKey());
+		String[] beanNames = ctx.getBeanDefinitionNames();
+		Arrays.sort(beanNames);
+		for (String beanName : beanNames) {
+			System.out.println(beanName);
 		}
-		System.out.println();
-
-		System.out.println("getMethods:");
-		ArrayList<ApiNode> methods = controller.getMethods(TestApiClass.class
-				.getName());
-		for (ApiNode method : methods) {
-			StringBuilder sb = new StringBuilder();
-			sb.append(method.getName() + "=" + method.getKey() + "(");
-			String prefix = "";
-			for (ApiAttribute apiAttribute : method.getInputs()) {
-				sb.append(prefix);
-				prefix = ",";
-				sb.append(apiAttribute.getName() + "=" + apiAttribute.getKey());
-			}
-			System.out.println(sb.append(")"));
-		}
-		System.out.println();
-
-//		System.out.println("invokde:");
-//		ApiInvokeRequest request = new ApiInvokeRequest();
-//		request.setClassName(TestApiClass.class.getName());
-//		request.setMethodName("test");
-//		request.setParams(Arrays.asList(new String[] { "input" }));
-//		String value = controller.invoke(request);
-//		System.out.println(value);
-//
-//		request.setParams(Arrays.asList(new String[] { "1", "3" }));
-//		value = controller.invoke(request);
-//		System.out.println(value);
 	}
 
 	@SuppressWarnings("rawtypes")
 	protected Map<String, Class> map = new HashMap<String, Class>();
 
 	public ApiController() {
-//		map.put(TestApiClass.class.getName(), TestApiClass.class);
 	}
 
-	@RequestMapping("/getClasses")
+	protected void addClass(Class<?> clazz) {
+		map.put(clazz.getName(), clazz);
+	}
+
 	public ArrayList<ApiAttribute> getClasses() {
 		ArrayList<ApiAttribute> attrs = new ArrayList<ApiAttribute>();
 		for (Class<?> clazz : map.values()) {
@@ -81,7 +56,6 @@ public class ApiController {
 		return attrs;
 	}
 
-	@RequestMapping("/getMethods")
 	public ArrayList<ApiNode> getMethods(
 			@RequestParam("className") String className) {
 		ArrayList<ApiNode> apiMethods = new ArrayList<ApiNode>();
@@ -93,6 +67,12 @@ public class ApiController {
 
 		Method[] methods = clazz.getDeclaredMethods();
 		for (Method method : methods) {
+			// only show methods that have annotation
+			Api annotation = method.getAnnotation(Api.class);
+			if (annotation == null) {
+				continue;
+			}
+
 			ApiNode apiMethod = new ApiNode();
 			ArrayList<ApiAttribute> attrs = new ArrayList<ApiAttribute>();
 
@@ -119,19 +99,17 @@ public class ApiController {
 			ApiAttribute attr = new ApiAttribute();
 			attr.setKey("p" + i);
 			attr.setType(paramType.getName());
+			attr.setName(paramType.getSimpleName()); // default
 
 			Annotation[] annotations = paramAnnotations[i++];
 			for (Annotation annotation : annotations) {
 				if (annotation instanceof Api) {
 					Api apiAnnotation = (Api) annotation;
-
 					String name = apiAnnotation.value();
-					if (name == null || name.isEmpty()) {
-						attr.setName(paramType.getSimpleName());
-					} else {
+					if (name != null && name.isEmpty()) {
+						// set name by annotation
 						attr.setName(name);
 					}
-
 					break;
 				}
 			}
@@ -143,7 +121,7 @@ public class ApiController {
 	private void setAnnotatioName(Class<?> clazz, ApiAttribute attr) {
 		boolean flag = clazz.isAnnotationPresent(Api.class);
 		if (flag) {
-			Api annotation = (Api) clazz.getAnnotation(Api.class);
+			Api annotation = clazz.getAnnotation(Api.class);
 			String name = annotation.value();
 			if (name == null || name.isEmpty()) {
 				attr.setName(clazz.getSimpleName());
@@ -158,7 +136,7 @@ public class ApiController {
 	private void setAnnotatioName(Method method, ApiAttribute attr) {
 		boolean flag = method.isAnnotationPresent(Api.class);
 		if (flag) {
-			Api annotation = (Api) method.getAnnotation(Api.class);
+			Api annotation = method.getAnnotation(Api.class);
 			String name = annotation.value();
 			if (name == null || name.isEmpty()) {
 				attr.setName(method.getName());
@@ -170,7 +148,6 @@ public class ApiController {
 		}
 	}
 
-	@RequestMapping("/invoke")
 	public ApiAttribute invoke(@RequestBody ApiInvokeRequest request) {
 		String className = request.getClassName();
 		String methodName = request.getMethodName();
@@ -196,8 +173,7 @@ public class ApiController {
 			if (method == null) {
 				String msg = "Error! Can't find specified function.";
 				System.err.println(msg);
-//				return msg;
-				return null;
+				return new ApiAttribute("error", msg);
 			}
 
 			// TODO check no-argument constructor
@@ -208,16 +184,15 @@ public class ApiController {
 
 			// invoke
 			String result = (String) method.invoke(instance, arguments);
-//			System.out.println(result);
-//			return result;
-			ApiAttribute apiResult = new ApiAttribute();
-			apiResult.setName(result);
+			ApiAttribute apiResult = new ApiAttribute("result", result);
 			return apiResult;
 
 		} catch (ReflectiveOperationException e) {
 			e.printStackTrace();
-//			return e.getMessage();
-			return null;
+			return new ApiAttribute("error", e.getMessage());
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			return new ApiAttribute("error", e.getMessage());
 		}
 	}
 
