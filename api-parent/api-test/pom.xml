@@ -5,16 +5,16 @@
 
 	<groupId>org.redcenter</groupId>
 	<artifactId>api-test</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.1-SNAPSHOT</version>
+	<!-- <packaging>${packaging.type}</packaging> -->
 
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.2.2.RELEASE</version>
+		 <groupId>org.redcenter.api</groupId>
+		<artifactId>api-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
 	<properties>
-		<java.version>1.7</java.version>
 		<!-- The main class to start by executing java -jar -->
 		<!--start-class>org.redcenter.api.target.Application</start-class-->
 		<start-class>org.redcenter.api.Application</start-class>
@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>org.redcenter</groupId>
 			<artifactId>api-framework</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
@@ -41,4 +41,29 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<!--profiles>
+	<profile>
+		<id>jar</id>
+		<activation>
+			<activeByDefault>true</activeByDefault>
+		</activation>
+		<properties>
+			<packaging.type>jar</packaging.type>
+		</properties>
+	</profile>	
+	<profile>
+		<id>war</id>
+		<properties>
+			<packaging.type>war</packaging.type>
+		</properties>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-tomcat</artifactId>
+				<scope>provided</scope>
+			</dependency>        
+		</dependencies>		
+	</profile>
+	</profiles-->
 </project>
