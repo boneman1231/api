@@ -1,0 +1,12 @@
+[
+{
+	"name": "Test Method",
+	"value": "test",
+	"inputs":[
+	{
+		"name": "the input",
+		"value": "java.lang.String"
+	}
+	]
+}
+]
