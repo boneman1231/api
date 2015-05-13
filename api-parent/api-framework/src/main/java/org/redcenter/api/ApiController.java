@@ -15,8 +15,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.ClassUtils;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @SpringBootApplication
 public class ApiController {
@@ -49,15 +47,14 @@ public class ApiController {
 		for (Class<?> clazz : map.values()) {
 			ApiAttribute attr = new ApiAttribute();
 			attr.setKey(clazz.getName());
-			setAnnotatioName(clazz, attr);
-			attr.setType(clazz.getName());
+			setAnnotatioAttr(clazz, attr);
+			attr.setType(clazz);
 			attrs.add(attr);
 		}
 		return attrs;
 	}
 
-	public ArrayList<ApiNode> getMethods(
-			@RequestParam("className") String className) {
+	public ArrayList<ApiNode> getMethods(String className) {
 		ArrayList<ApiNode> apiMethods = new ArrayList<ApiNode>();
 
 		Class<?> clazz = map.get(className);
@@ -77,11 +74,11 @@ public class ApiController {
 			ArrayList<ApiAttribute> attrs = new ArrayList<ApiAttribute>();
 
 			apiMethod.setKey(method.getName());
-			setAnnotatioName(method, apiMethod);
-			apiMethod.setType(clazz.getName());
+			setAnnotatioAttr(method, apiMethod);
+			apiMethod.setType(clazz);
 
 			// set method input parameter
-			setApiAttribute(method, attrs);
+			setParamsAttributes(method, attrs);
 			apiMethod.setInputs(attrs);
 
 			apiMethods.add(apiMethod);
@@ -90,7 +87,8 @@ public class ApiController {
 		return apiMethods;
 	}
 
-	private void setApiAttribute(Method method, ArrayList<ApiAttribute> attrs) {
+	private void setParamsAttributes(Method method,
+			ArrayList<ApiAttribute> attrs) {
 		Annotation[][] paramAnnotations = method.getParameterAnnotations();
 		Class<?>[] paramTypes = method.getParameterTypes();
 		int i = 0;
@@ -98,18 +96,15 @@ public class ApiController {
 		for (Class<?> paramType : paramTypes) {
 			ApiAttribute attr = new ApiAttribute();
 			attr.setKey("p" + i);
-			attr.setType(paramType.getName());
+			attr.setType(paramType);
 			attr.setName(paramType.getSimpleName()); // default
 
+			// set api attribute for the parameter
 			Annotation[] annotations = paramAnnotations[i++];
 			for (Annotation annotation : annotations) {
 				if (annotation instanceof Api) {
 					Api apiAnnotation = (Api) annotation;
-					String name = apiAnnotation.value();
-					if (name != null && name.isEmpty()) {
-						// set name by annotation
-						attr.setName(name);
-					}
+					setParamAttribute(apiAnnotation, attr);
 					break;
 				}
 			}
@@ -118,7 +113,47 @@ public class ApiController {
 		}
 	}
 
-	private void setAnnotatioName(Class<?> clazz, ApiAttribute attr) {
+	private void setParamAttribute(Api apiAnnotation, ApiAttribute attr) {
+		// set name by annotation
+		String name = apiAnnotation.value();
+		if (name != null && !name.isEmpty()) {
+			attr.setName(name);
+		}
+
+		// set default value by annotation
+		String value = apiAnnotation.value();
+		if (value != null && !value.isEmpty()) {
+			attr.setValue(value);
+		}
+
+		// set options by annotation
+		Option[] options = apiAnnotation.options();
+		if (options != null && options.length > 0) {
+			setOptions(options, attr);
+		}
+
+		// set description
+		String desc = apiAnnotation.desc();
+		if (desc != null && !desc.isEmpty()) {
+			attr.setDescription(desc);
+		}
+	}
+
+	private void setOptions(Option[] options, ApiAttribute attr) {
+		ArrayList<ApiAttribute> apiOptions = new ArrayList<>();
+		for (Option option : options) {
+			String key = option.key();
+			String value = option.value();
+			if (key == null || key.isEmpty()) {
+				key = value;
+			}
+			apiOptions.add(new ApiAttribute(key, value));
+		}
+		attr.setOptions(apiOptions);
+		attr.setType(Option.class);
+	}
+
+	private void setAnnotatioAttr(Class<?> clazz, ApiAttribute attr) {
 		boolean flag = clazz.isAnnotationPresent(Api.class);
 		if (flag) {
 			Api annotation = clazz.getAnnotation(Api.class);
@@ -128,12 +163,18 @@ public class ApiController {
 			} else {
 				attr.setName(name);
 			}
+
+			// set description
+			String desc = annotation.desc();
+			if (desc != null && !desc.isEmpty()) {
+				attr.setDescription(desc);
+			}
 		} else {
 			attr.setName(clazz.getSimpleName());
 		}
 	}
 
-	private void setAnnotatioName(Method method, ApiAttribute attr) {
+	private void setAnnotatioAttr(Method method, ApiAttribute attr) {
 		boolean flag = method.isAnnotationPresent(Api.class);
 		if (flag) {
 			Api annotation = method.getAnnotation(Api.class);
@@ -143,12 +184,18 @@ public class ApiController {
 			} else {
 				attr.setName(name);
 			}
+
+			// set description
+			String desc = annotation.desc();
+			if (desc != null && !desc.isEmpty()) {
+				attr.setDescription(desc);
+			}
 		} else {
 			attr.setName(method.getName());
 		}
 	}
 
-	public ApiAttribute invoke(@RequestBody ApiInvokeRequest request) {
+	public ApiAttribute invoke(ApiInvokeRequest request) {
 		String className = request.getClassName();
 		String methodName = request.getMethodName();
 		List<String> params = request.getParams();

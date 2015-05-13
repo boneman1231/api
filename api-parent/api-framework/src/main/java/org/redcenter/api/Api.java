@@ -8,9 +8,13 @@ public @interface Api {
 
 	String value() default "";
 
-	Class<?> type() default String.class;
+	// Class<?> type() default String.class;
 
-	String[] options() default {};
-	
 	String desc() default "";
+
+	/**
+	 * only active for parameter annotation
+	 * @return
+	 */
+	Option[] options() default {};
 }

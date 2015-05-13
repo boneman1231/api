@@ -26,7 +26,12 @@ public class ReflectionUtils {
 	}
 
 	public static Class<?> getWrapperClass(Class<?> clazz) {
-		return WRAPPER_TYPES_MAP.get(clazz);
+		Class<?> wrapperClass = WRAPPER_TYPES_MAP.get(clazz);
+		if (wrapperClass == null) {
+			return clazz;
+		} else {
+			return wrapperClass;
+		}
 	}
 
 	public static <T> T valueOf(Class<T> clazz, String arg) {

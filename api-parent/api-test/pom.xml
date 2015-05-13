@@ -5,6 +5,7 @@
 
 	<groupId>org.redcenter</groupId>
 	<artifactId>api-test</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 	<!-- <packaging>${packaging.type}</packaging> -->
 
 	<parent>

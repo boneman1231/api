@@ -1,5 +1,10 @@
 package org.redcenter.api.vo;
 
+import java.util.ArrayList;
+
+import org.redcenter.api.HtmlUtils;
+import org.redcenter.api.Option;
+
 public class ApiAttribute {
 
 	protected String key;
@@ -10,6 +15,8 @@ public class ApiAttribute {
 
 	protected String value;
 	
+	protected ArrayList<ApiAttribute> options;
+
 	protected String description;
 
 	public ApiAttribute() {
@@ -52,8 +59,9 @@ public class ApiAttribute {
 		return type;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setType(Class<?> typeClass) {
+		// get input type for Angular JS
+		this.type = HtmlUtils.getInputType(typeClass);
 	}
 
 	public String getValue() {
@@ -62,6 +70,14 @@ public class ApiAttribute {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public ArrayList<ApiAttribute> getOptions() {
+		return options;
+	}
+
+	public void setOptions(ArrayList<ApiAttribute> options) {
+		this.options = options;
 	}
 
 	public String getDescription() {

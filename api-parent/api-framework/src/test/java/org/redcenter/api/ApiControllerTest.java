@@ -1,9 +1,11 @@
 package org.redcenter.api;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,6 +58,9 @@ public class ApiControllerTest {
 				sb.append(apiAttribute.getName() + "=" + apiAttribute.getKey());
 			}
 			System.out.println(sb.append(")"));
+			System.out.println("\t"
+					+ new ReflectionToStringBuilder(method,
+							new RecursiveToStringStyle()).toString());
 		}
 		System.out.println();
 	}
