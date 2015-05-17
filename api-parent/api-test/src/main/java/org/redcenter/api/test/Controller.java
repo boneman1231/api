@@ -8,6 +8,7 @@ import org.redcenter.api.vo.ApiAttribute;
 import org.redcenter.api.vo.ApiInvokeRequest;
 import org.redcenter.api.vo.ApiNode;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.SpringApplication;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class Controller extends ApiController {
 
+	public static void main(String[] args) {
+		SpringApplication.run(Controller.class, args);
+	}
+	
 	public Controller() {
 		addClass(TestApiClass.class);
 	}
