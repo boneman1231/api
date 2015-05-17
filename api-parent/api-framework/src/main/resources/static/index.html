@@ -11,54 +11,66 @@
 
 <!-- my code -->
 <script src="app.js"></script>
-<link rel="stylesheet" href="style.css">
+<!--link rel="stylesheet" href="style.css"-->
 </head>
 
 <body ng-app="MainModule" class="container">
-	<h1>API Go! Go! Go!</h1>
+	<h1 class="page-header">API Go! Go! Go!</h1>
 	<div ng-controller="ApiController">
-		<div class="row">
-			<label class="col-md-2">Category</label> 
-			<select class="col-md-4"
-				ng-model="classSelect"
-				ng-options="class.name for class in classModel"
-				ng-change="updateClass()"
-				tooltip="{{classSelect.description}}" >
-			</select>
-		</div>
-		<div class="row">
-			<label class="col-md-2">Function</label> 
-			<select class="col-md-4"
-				ng-model="methodSelect"
-				ng-options="method.name for method in methodModel"
-				ng-change="updateMethod()"
-				tooltip="{{methodSelect.description}}" >
-			</select>
-		</div>
-		<hr>		
-		<div class="row" ng-repeat="input in methodSelect.inputs">
-			<label class="col-md-2">{{input.name}}</label> 
-			<div class="col-md-4" ng-switch on="input.type">		      
-				<input ng-switch-default type="text"				      
-					ng-model="paramModel[input.key]"
-					tooltip="{{input.description}}" >
-				<input ng-switch-when="number" type="number"				      
-					ng-model="paramModel[input.key]" 
-					tooltip="{{input.description}}" >
-				<select ng-switch-when="Option" 
-					ng-options="option.key as option.value for option in input.options"				
-					ng-model="paramModel[input.key]" 
-					ng-init="paramModel[input.key]=input.options[0].key" 
-					tooltip="{{input.description}}" >	
+		<form class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Category</label> 
+				<div class="col-sm-4">
+				<select class="form-control"
+					ng-model="classSelect"
+					ng-options="class.name for class in classModel"
+					ng-change="updateClass()"
+					tooltip="{{classSelect.description}}" >
 				</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Function</label> 
+				<div class="col-sm-4">
+				<select class="form-control"
+					ng-model="methodSelect"
+					ng-options="method.name for method in methodModel"
+					ng-change="updateMethod()"
+					tooltip="{{methodSelect.description}}" >
+				</select>
+				</div>
+			</div>
+			<div class="form-group" ng-repeat="input in methodSelect.inputs">
+				<label class="col-sm-2 control-label">{{input.name}}</label> 
+				<div class="col-sm-4" ng-switch on="input.type">		      
+					<input ng-switch-default type="text" class="form-control"
+						ng-model="paramModel[input.key]"
+						tooltip="{{input.description}}" >
+					<input ng-switch-when="number" type="number" class="form-control"
+						ng-model="paramModel[input.key]" 
+						tooltip="{{input.description}}" >
+					<select ng-switch-when="Option" class="form-control"
+						ng-options="option.key as option.value for option in input.options"				
+						ng-model="paramModel[input.key]" 
+						ng-init="paramModel[input.key]=input.options[0].key" 
+						tooltip="{{input.description}}" >	
+					</select>
+				</div>			
 			</div>			
-		</div>
-		<hr>
-		<button type="button" ng-Click="submit()"   
-			class="btn btn-lg btn-primary">Submit</button>
-		<br> <br>
-		<textarea class="col-md-8" ng-model="resultArea" style="width: 600px;">
-	    </textarea>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-4">
+					<button type="submit" class="btn btn-lg btn-primary"
+						ng-Click="submit()">Submit</button>
+			    </div>
+			</div>			
+			<hr>	
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Result</label> 
+				<div class="col-sm-4">					
+					<textarea class="form-control" ng-model="resultArea" ></textarea>
+				</div>			
+			</div>			
+		</form>		
 	</div>
 </body>
 
