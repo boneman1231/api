@@ -1,36 +1,20 @@
 package org.redcenter.api;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.redcenter.api.annotation.Api;
+import org.redcenter.api.annotation.Option;
 import org.redcenter.api.vo.ApiAttribute;
 import org.redcenter.api.vo.ApiInvokeRequest;
 import org.redcenter.api.vo.ApiNode;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-import org.springframework.util.ClassUtils;
 
-@SpringBootApplication
 public class ApiController {
-
-	public static void main(String[] args) {
-		// SpringApplication.run(Application.class, args);
-		ApplicationContext ctx = SpringApplication.run(ApiController.class,
-				args);
-		System.out.println("Let's inspect the beans provided by Spring Boot:");
-
-		String[] beanNames = ctx.getBeanDefinitionNames();
-		Arrays.sort(beanNames);
-		for (String beanName : beanNames) {
-			System.out.println(beanName);
-		}
-	}
 
 	@SuppressWarnings("rawtypes")
 	protected Map<String, Class> map = new HashMap<String, Class>();
@@ -140,7 +124,7 @@ public class ApiController {
 	}
 
 	private void setOptions(Option[] options, ApiAttribute attr) {
-		ArrayList<ApiAttribute> apiOptions = new ArrayList<>();
+		ArrayList<ApiAttribute> apiOptions = new ArrayList<ApiAttribute>();
 		for (Option option : options) {
 			String key = option.key();
 			String value = option.value();
@@ -233,8 +217,13 @@ public class ApiController {
 			String result = (String) method.invoke(instance, arguments);
 			ApiAttribute apiResult = new ApiAttribute("result", result);
 			return apiResult;
-
-		} catch (ReflectiveOperationException e) {
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+			return new ApiAttribute("error", e.getMessage());
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+			return new ApiAttribute("error", e.getMessage());
+		} catch (InstantiationException e) {
 			e.printStackTrace();
 			return new ApiAttribute("error", e.getMessage());
 		} catch (IllegalArgumentException e) {
@@ -252,7 +241,7 @@ public class ApiController {
 
 			if (paramType == String.class) {
 				parameters.add(value);
-			} else if (ClassUtils.isPrimitiveOrWrapper(paramType)) {
+			} else if (ReflectionUtils.isPrimitiveOrWrapper(paramType)) {
 				// only wrapper type has valueOf method
 				paramType = ReflectionUtils.getWrapperClass(paramType);
 				Object obj = ReflectionUtils.valueOf(paramType, value);

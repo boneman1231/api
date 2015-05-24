@@ -3,35 +3,49 @@ package org.redcenter.api;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class ReflectionUtils {
-	private static final Map<Class<?>, Class<?>> WRAPPER_TYPES_MAP = getWrapperMap();
 
-	public static boolean isWrapperType(Class<?> clazz) {
-		return WRAPPER_TYPES_MAP.values().contains(clazz);
+	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_MAP;
+	private static final Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITIVE_MAP;
+
+	static {
+		PRIMITIVE_TO_WRAPPER_MAP = new HashMap<Class<?>, Class<?>>(8);
+		PRIMITIVE_TO_WRAPPER_MAP.put(boolean.class, Boolean.class);
+		PRIMITIVE_TO_WRAPPER_MAP.put(char.class, Character.class);
+		PRIMITIVE_TO_WRAPPER_MAP.put(byte.class, Byte.class);
+		PRIMITIVE_TO_WRAPPER_MAP.put(short.class, Short.class);
+		PRIMITIVE_TO_WRAPPER_MAP.put(int.class, Integer.class);
+		PRIMITIVE_TO_WRAPPER_MAP.put(long.class, Long.class);
+		PRIMITIVE_TO_WRAPPER_MAP.put(float.class, Float.class);
+		PRIMITIVE_TO_WRAPPER_MAP.put(double.class, Double.class);
+		// PRIMITIVE_TO_WRAPPER_MAP.put(void.class, Void.class);
+
+		WRAPPER_TO_PRIMITIVE_MAP = new HashMap<Class<?>, Class<?>>(8);
+		Set<Entry<Class<?>, Class<?>>> entries = PRIMITIVE_TO_WRAPPER_MAP
+				.entrySet();
+		for (Entry<Class<?>, Class<?>> entry : entries) {
+			WRAPPER_TO_PRIMITIVE_MAP.put(entry.getValue(), entry.getValue());
+		}
 	}
 
-	private static Map<Class<?>, Class<?>> getWrapperMap() {
-		Map<Class<?>, Class<?>> map = new HashMap<>();
-		map.put(boolean.class, Boolean.class);
-		map.put(char.class, Character.class);
-		map.put(byte.class, Byte.class);
-		map.put(short.class, Short.class);
-		map.put(int.class, Integer.class);
-		map.put(long.class, Long.class);
-		map.put(float.class, Float.class);
-		map.put(double.class, Double.class);
-		// map.put(void.class, Void.class);
-		return map;
+	public static boolean isWrapperType(Class<?> clazz) {
+		return WRAPPER_TO_PRIMITIVE_MAP.containsKey(clazz);
 	}
 
 	public static Class<?> getWrapperClass(Class<?> clazz) {
-		Class<?> wrapperClass = WRAPPER_TYPES_MAP.get(clazz);
+		Class<?> wrapperClass = PRIMITIVE_TO_WRAPPER_MAP.get(clazz);
 		if (wrapperClass == null) {
 			return clazz;
 		} else {
 			return wrapperClass;
 		}
+	}
+
+	public static boolean isPrimitiveOrWrapper(Class<?> clazz) {
+		return ((clazz.isPrimitive()) || (isWrapperType(clazz)));
 	}
 
 	public static <T> T valueOf(Class<T> clazz, String arg) {

@@ -1,0 +1,4 @@
+<blueprint xmlns=”http://www.osgi.org/xmlns/blueprint/v1.0.0”>
+	<bean id="apiServiceBean" class="org.redcenter.api.test.TestApiClass" />
+	<service id="apiService" ref="apiServiceBean" interface="org.redcenter.api.ApiConrtoller" />
+</blueprint>

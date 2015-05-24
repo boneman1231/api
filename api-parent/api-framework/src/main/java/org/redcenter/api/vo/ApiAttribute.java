@@ -3,7 +3,6 @@ package org.redcenter.api.vo;
 import java.util.ArrayList;
 
 import org.redcenter.api.HtmlUtils;
-import org.redcenter.api.Option;
 
 public class ApiAttribute {
 

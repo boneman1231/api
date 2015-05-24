@@ -1,7 +1,7 @@
 package org.redcenter.api.test;
 
-import org.redcenter.api.Api;
-import org.redcenter.api.Option;
+import org.redcenter.api.annotation.Api;
+import org.redcenter.api.annotation.Option;
 
 @Api("測試功能")
 public class TestApiClass {

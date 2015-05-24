@@ -1,6 +1,7 @@
 package org.redcenter.api;
 
-import org.redcenter.api.Api;
+import org.redcenter.api.annotation.Api;
+import org.redcenter.api.annotation.Option;
 
 @Api("TestClass")
 public class TestApiClass {
