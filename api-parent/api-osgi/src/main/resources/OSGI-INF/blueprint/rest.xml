@@ -21,9 +21,9 @@
 
 	<bean id="apiServiceBean"
 		class="org.redcenter.api.RestService">
-		<property name="apiService" ref="apiService" />
+		<property name="apiClass" ref="apiClass" />
 	</bean>
 
-	<reference id="apiService" interface="org.redcenter.api.ApiConrtoller" />
+	<reference id="apiClass" interface="org.redcenter.api.spi.IApiClass" />
 
 </blueprint>
