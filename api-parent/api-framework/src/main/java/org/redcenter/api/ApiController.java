@@ -12,20 +12,37 @@ import org.redcenter.api.annotation.Api;
 import org.redcenter.api.annotation.Option;
 import org.redcenter.api.vo.ApiAttribute;
 import org.redcenter.api.vo.ApiInvokeRequest;
-import org.redcenter.api.vo.ApiNode;
+import org.redcenter.api.vo.ApiMethod;
 
-public class ApiController {
+public class ApiController implements IApiController {
 
-	@SuppressWarnings("rawtypes")
-	protected Map<String, Class> map = new HashMap<String, Class>();
+	protected Map<String, Class<?>> map = new HashMap<String, Class<?>>();
 
 	public ApiController() {
+	}
+
+	public ApiController(Class<?> clazz) {
+		addClass(clazz);
 	}
 
 	protected void addClass(Class<?> clazz) {
 		map.put(clazz.getName(), clazz);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.redcenter.api.IApiController#getMap()
+	 */
+	public Map<String, Class<?>> getMap() {
+		return map;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.redcenter.api.IApiController#getClasses()
+	 */
 	public ArrayList<ApiAttribute> getClasses() {
 		ArrayList<ApiAttribute> attrs = new ArrayList<ApiAttribute>();
 		for (Class<?> clazz : map.values()) {
@@ -38,8 +55,13 @@ public class ApiController {
 		return attrs;
 	}
 
-	public ArrayList<ApiNode> getMethods(String className) {
-		ArrayList<ApiNode> apiMethods = new ArrayList<ApiNode>();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.redcenter.api.IApiController#getMethods(java.lang.String)
+	 */
+	public ArrayList<ApiMethod> getMethods(String className) {
+		ArrayList<ApiMethod> apiMethods = new ArrayList<ApiMethod>();
 
 		Class<?> clazz = map.get(className);
 		if (clazz == null) {
@@ -54,7 +76,7 @@ public class ApiController {
 				continue;
 			}
 
-			ApiNode apiMethod = new ApiNode();
+			ApiMethod apiMethod = new ApiMethod();
 			ArrayList<ApiAttribute> attrs = new ArrayList<ApiAttribute>();
 
 			apiMethod.setKey(method.getName());
@@ -108,6 +130,12 @@ public class ApiController {
 		String value = apiAnnotation.value();
 		if (value != null && !value.isEmpty()) {
 			attr.setValue(value);
+		}
+
+		// set type by annotation
+		Class<?> type = apiAnnotation.type();
+		if (type != null) {
+			attr.setType(type);
 		}
 
 		// set options by annotation
@@ -179,6 +207,13 @@ public class ApiController {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.redcenter.api.IApiController#invoke(org.redcenter.api.vo.ApiInvokeRequest
+	 * )
+	 */
 	public ApiAttribute invoke(ApiInvokeRequest request) {
 		String className = request.getClassName();
 		String methodName = request.getMethodName();

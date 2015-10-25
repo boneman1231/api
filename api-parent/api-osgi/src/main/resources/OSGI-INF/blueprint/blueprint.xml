@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+	<service id="restService" ref="restBean"
+		interface="org.redcenter.api.osgi.IRestService" depends-on="refs">
+		<service-properties>
+			<entry key="service.exported.interfaces" value="*" />
+			<entry key="service.exported.intents" value="HTTP" />
+			<entry key="service.exported.configs" value="org.apache.cxf.rs" />
+
+			<!-- http://localhost:8181/cxf/api?_wadl see REST service method, EX: 
+				http://localhost:8181/cxf/api/ -->
+			<entry key="org.apache.cxf.rs.address" value="/api" />
+			<entry key="org.apache.cxf.rs.provider" value="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+		</service-properties>
+	</service>
+	
+	<bean id="restBean" class="org.redcenter.api.osgi.RestService" />
+	
+	<reference-list id="refs" interface="org.redcenter.api.IApiController">
+		<reference-listener bind-method="bind"
+			unbind-method="unbind" ref="restBean" />
+	</reference-list>
+</blueprint>

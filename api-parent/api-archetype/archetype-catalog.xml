@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-catalog>
+	<archetypes>
+		<archetype>
+			<groupId>org.redcenter</groupId>
+			<artifactId>api-osgi-archetype</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</archetype>
+	</archetypes>
+</archetype-catalog>

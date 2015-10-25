@@ -10,7 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.redcenter.api.vo.ApiAttribute;
-import org.redcenter.api.vo.ApiNode;
+import org.redcenter.api.vo.ApiMethod;
 
 public class ApiControllerTest {
 	private ApiController controller = null;
@@ -46,9 +46,9 @@ public class ApiControllerTest {
 		controller.addClass(TestApiClass.class);
 
 		System.out.println("getMethods:");
-		ArrayList<ApiNode> methods = controller.getMethods(TestApiClass.class
+		ArrayList<ApiMethod> methods = controller.getMethods(TestApiClass.class
 				.getName());
-		for (ApiNode method : methods) {
+		for (ApiMethod method : methods) {
 			StringBuilder sb = new StringBuilder();
 			sb.append(method.getName() + "=" + method.getKey() + "(");
 			String prefix = "";

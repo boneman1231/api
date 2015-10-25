@@ -6,8 +6,14 @@ import org.redcenter.api.HtmlUtils;
 
 public class ApiAttribute {
 
+	/**
+	 * to match class or method name
+	 */
 	protected String key;
 
+	/**
+	 * to display in UI component
+	 */
 	protected String name;
 
 	protected String type;
@@ -27,15 +33,6 @@ public class ApiAttribute {
 		this.type = String.class.getName();
 		this.value = value;
 		this.description = "";
-	}
-
-	public ApiAttribute(String key, String name, String type, String value,
-			String description) {
-		this.key = key;
-		this.name = name;
-		this.type = type;
-		this.value = value;
-		this.description = description;
 	}
 
 	public String getName() {
@@ -60,7 +57,7 @@ public class ApiAttribute {
 
 	public void setType(Class<?> typeClass) {
 		// get input type for Angular JS
-		this.type = HtmlUtils.getInputType(typeClass);
+		this.type = HtmlUtils.getHtmlType(typeClass);
 	}
 
 	public String getValue() {

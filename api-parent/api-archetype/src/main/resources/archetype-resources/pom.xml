@@ -4,14 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.redcenter</groupId>
-	<artifactId>api-osgi-impl</artifactId>
+	<artifactId>api-osgi-sample</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>bundle</packaging>
-    <!-- <packaging>maven-archetype</packaging> -->
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!-- <java.version>1.7</java.version> -->
 	</properties>
 
 	<dependencies>
@@ -20,7 +17,14 @@
 			<artifactId>api-framework</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>provided</scope>
-		</dependency>		
+		</dependency>
+		
+		<dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>4.3.1</version>
+            <scope>provided</scope>
+        </dependency>
 	</dependencies>
 
 	<build>
@@ -32,19 +36,11 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Import-Package>org.redcenter.api,*</Import-Package>
+						<Import-Package>*</Import-Package>
 						<Export-Package>*</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
-			
-			<!-- archetype:create-from-project -->
-			<!-- <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-archetype-plugin</artifactId>
-                <version>2.4</version>
-                <extensions>true</extensions>
-            </plugin> -->
 		</plugins>
 	</build>
 </project>
