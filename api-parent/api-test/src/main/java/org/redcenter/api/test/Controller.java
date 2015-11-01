@@ -7,7 +7,7 @@ import org.redcenter.api.ApiController;
 import org.redcenter.api.test.TestApiClass;
 import org.redcenter.api.vo.ApiAttribute;
 import org.redcenter.api.vo.ApiInvokeRequest;
-import org.redcenter.api.vo.ApiNode;
+import org.redcenter.api.vo.ApiMethod;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -44,7 +44,7 @@ public class Controller extends ApiController {
 	}
 
 	@RequestMapping("/getMethods")
-	public ArrayList<ApiNode> getMethods(
+	public ArrayList<ApiMethod> getMethods(
 			@RequestParam("className") String className) {
 		return super.getMethods(className);
 	}

@@ -37,20 +37,33 @@
 			<artifactId>api-framework</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-
-        <!-- Karaf 3 -->
-        <!-- <dependency>
-			<groupId>javax.ws.rs</groupId>
-			<artifactId>jsr311-api</artifactId>
-			<version>1.1.1</version>
-		</dependency> -->
-		<!-- Karaf 4 -->
-		<dependency>
-			<groupId>javax.ws.rs</groupId>
-			<artifactId>javax.ws.rs-api</artifactId>
-			<version>2.0.1</version>
-		</dependency>
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>karaf3</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>javax.ws.rs</groupId>
+					<artifactId>jsr311-api</artifactId>
+					<version>1.1.1</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>karaf4</id>
+			<dependencies>
+				<dependency>
+					<groupId>javax.ws.rs</groupId>
+					<artifactId>javax.ws.rs-api</artifactId>
+					<version>2.0.1</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 
 	<build>
 		<plugins>
