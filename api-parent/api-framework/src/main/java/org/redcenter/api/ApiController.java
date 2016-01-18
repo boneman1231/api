@@ -1,5 +1,6 @@
 package org.redcenter.api;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -8,6 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.ObjectWriter;
 import org.redcenter.api.annotation.Api;
 import org.redcenter.api.annotation.Option;
 import org.redcenter.api.vo.ApiAttribute;
@@ -93,8 +98,7 @@ public class ApiController implements IApiController {
 		return apiMethods;
 	}
 
-	private void setParamsAttributes(Method method,
-			ArrayList<ApiAttribute> attrs) {
+	private void setParamsAttributes(Method method, ArrayList<ApiAttribute> attrs) {
 		Annotation[][] paramAnnotations = method.getParameterAnnotations();
 		Class<?>[] paramTypes = method.getParameterTypes();
 		int i = 0;
@@ -210,9 +214,8 @@ public class ApiController implements IApiController {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.redcenter.api.IApiController#invoke(org.redcenter.api.vo.ApiInvokeRequest
-	 * )
+	 * @see org.redcenter.api.IApiController#invoke(org.redcenter.api.vo.
+	 * ApiInvokeRequest )
 	 */
 	public ApiAttribute invoke(ApiInvokeRequest request) {
 		String className = request.getClassName();
@@ -229,8 +232,7 @@ public class ApiController implements IApiController {
 			Method method = null;
 			Method[] methods = clazz.getDeclaredMethods();
 			for (Method m : methods) {
-				if (m.getName().equals(methodName)
-						&& m.getParameterTypes().length == paramSize) {
+				if (m.getName().equals(methodName) && m.getParameterTypes().length == paramSize) {
 					method = m;
 					break;
 				}
@@ -249,8 +251,15 @@ public class ApiController implements IApiController {
 			Object[] arguments = getParametrs(method, params);
 
 			// invoke
-			String result = (String) method.invoke(instance, arguments);
-			ApiAttribute apiResult = new ApiAttribute("result", result);
+			Object result = method.invoke(instance, arguments);
+			ApiAttribute apiResult;
+			if (ReflectionUtils.isPrimitiveOrWrapper(result.getClass())) {
+				apiResult = new ApiAttribute("result", String.valueOf(result));
+			} else {
+				ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+				String json = ow.writeValueAsString(result);
+				apiResult = new ApiAttribute("result", json, "json");
+			}
 			return apiResult;
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
@@ -262,6 +271,15 @@ public class ApiController implements IApiController {
 			e.printStackTrace();
 			return new ApiAttribute("error", e.getMessage());
 		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			return new ApiAttribute("error", e.getMessage());
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+			return new ApiAttribute("error", e.getMessage());
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+			return new ApiAttribute("error", e.getMessage());
+		} catch (IOException e) {
 			e.printStackTrace();
 			return new ApiAttribute("error", e.getMessage());
 		}
@@ -283,8 +301,7 @@ public class ApiController implements IApiController {
 				parameters.add(obj);
 			} else {
 				// TODO throw exception?
-				System.err.println(method.getName() + " parameter type "
-						+ paramType.getName() + " is not primitive ");
+				System.err.println(method.getName() + " parameter type " + paramType.getName() + " is not primitive ");
 			}
 		}
 		return parameters.toArray();

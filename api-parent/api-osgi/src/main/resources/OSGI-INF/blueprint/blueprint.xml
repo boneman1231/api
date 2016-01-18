@@ -10,6 +10,7 @@
 			<!-- http://localhost:8181/cxf/api?_wadl see REST service method, EX: 
 				http://localhost:8181/cxf/api/ -->
 			<entry key="org.apache.cxf.rs.address" value="/api" />
+			<!-- instead of JAXB annotation -->
 			<entry key="org.apache.cxf.rs.provider" value="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
 		</service-properties>
 	</service>
